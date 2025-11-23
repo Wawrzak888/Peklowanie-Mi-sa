@@ -2,22 +2,8 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MeatScience - Domowy Kalkulator Wędliniarski</title>
-    
-    <!-- PWA / Mobile Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MeatScience">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="Zaawansowany kalkulator peklowania i nastrzyku mięsa">
-    
-    <!-- Manifest Link -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Icons (Optional but recommended for iOS) -->
-    <link rel="apple-touch-icon" href="icon-192.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -27,8 +13,6 @@
             font-family: 'Inter', sans-serif;
             background-color: #0f172a; /* Slate 900 */
             color: #e2e8f0; /* Slate 200 */
-            /* Prevent pull-to-refresh on mobile which looks weird in standalone app */
-            overscroll-behavior-y: none;
         }
         
         .font-mono {
@@ -161,14 +145,9 @@
         .update-flash {
             animation: flash 0.5s ease-out;
         }
-        
-        /* PWA Install Button (Hidden by default) */
-        #installBtn {
-            display: none;
-        }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 pb-24">
+<body class="min-h-screen p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
@@ -178,20 +157,14 @@
                     MeatScience
                 </h1>
                 <p class="text-slate-400 mt-2 text-sm max-w-xl">
-                    Zaawansowany kalkulator peklowania domowego.
+                    Zaawansowany kalkulator peklowania domowego (Metoda 50/50). Bezpieczna i zdrowa obróbka mięsa.
                 </p>
             </div>
             <div class="mt-4 md:mt-0 text-right hidden md:block">
                 <div class="text-xs text-slate-300 font-bold font-mono uppercase tracking-wider mb-1">Autor: Tomasz Wawrzak</div>
-                <div class="text-xs text-emerald-500 font-mono"><i class="fas fa-mobile-alt"></i> v3.5.0 | PWA MOBILE</div>
+                <div class="text-xs text-emerald-500 font-mono"><i class="fas fa-syringe"></i> v3.3.0 | INJECTION READY</div>
             </div>
         </header>
-        
-        <!-- Install PWA Prompt (Optional UI) -->
-        <div id="installBtn" class="mb-6 bg-indigo-900/50 border border-indigo-500 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:bg-indigo-900/70 transition">
-            <div class="text-sm text-indigo-200"><i class="fas fa-download mr-2"></i> Zainstaluj aplikację na telefonie</div>
-            <button class="bg-indigo-600 text-white text-xs px-3 py-1 rounded">Instaluj</button>
-        </div>
 
         <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
@@ -251,7 +224,7 @@
                             </label>
                         </div>
 
-                        <!-- Injection Toggle -->
+                        <!-- NEW: Injection Toggle (Hidden by default) -->
                         <div id="injectionGroup" class="hidden mt-4 p-3 bg-indigo-900/30 rounded border border-indigo-500/30 transition-all">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
                                 <div class="relative">
@@ -338,7 +311,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="result-card border-l-indigo-500">
                         <div class="result-label" id="timeLabel">Czas Peklowania (Dyfuzja)</div>
-                        <div class="result-value" id="resTime">0 dni</div>
+                        <div class="result-value" id="resTime">0.0 dni</div>
                         <div class="text-xs text-slate-500 mt-1" id="resTimeDetail">T = 0.5 * L² + 2 (Safety)</div>
                     </div>
                     <div class="result-card border-l-emerald-500">
@@ -348,7 +321,7 @@
                     </div>
                 </div>
 
-                <!-- Injection Result Card (Dynamic) -->
+                <!-- NEW: Injection Result Card (Dynamic) -->
                 <div id="injectionResultCard" class="hidden result-card accent-orange border-l-orange-500 bg-orange-900/10">
                     <div class="flex justify-between items-start">
                         <div>
@@ -413,7 +386,7 @@
                             </div>
                         </div>
                         
-                        <!-- Injection Logic Legend -->
+                        <!-- NEW: Injection Logic Legend -->
                         <div class="flex gap-3 items-start">
                             <div class="bg-slate-800 p-2 rounded text-orange-400"><i class="fas fa-syringe"></i></div>
                             <div>
@@ -444,37 +417,6 @@
     </div>
 
     <script>
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW zarejestrowany:', reg.scope))
-                    .catch(err => console.log('SW błąd:', err));
-            });
-        }
-
-        // Install Prompt Handling
-        let deferredPrompt;
-        const installBtn = document.getElementById('installBtn');
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
-
-        installBtn.addEventListener('click', () => {
-            installBtn.style.display = 'none';
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Użytkownik zaakceptował instalację A2HS');
-                }
-                deferredPrompt = null;
-            });
-        });
-
-        // --- CORE CALCULATOR LOGIC (v3.5) ---
         class MeatScienceCalculator {
             constructor() {
                 this.inputs = {
@@ -487,6 +429,7 @@
                     curingMethod: document.querySelectorAll('input[name="curingMethod"]'),
                     targetSalt: document.getElementById('targetSalt'),
                     mixRatio: document.getElementById('mixRatio'),
+                    // NEW Input
                     useInjection: document.getElementById('useInjection'),
                     injectionGroup: document.getElementById('injectionGroup')
                 };
@@ -494,7 +437,7 @@
                 this.outputs = {
                     time: document.getElementById('resTime'),
                     timeDetail: document.getElementById('resTimeDetail'),
-                    timeLabel: document.getElementById('timeLabel'),
+                    timeLabel: document.getElementById('timeLabel'), // NEW
                     totalWeight: document.getElementById('resTotalWeight'),
                     table: document.getElementById('ingredientsTable'),
                     report: document.getElementById('reportOutput'),
@@ -502,6 +445,7 @@
                     waterInputGroup: document.getElementById('waterInputGroup'),
                     ratioDisplay: document.getElementById('ratioDisplay'),
                     ppmResult: document.getElementById('ppmResult'),
+                    // NEW Output
                     injectionResultCard: document.getElementById('injectionResultCard'),
                     resInjectionVol: document.getElementById('resInjectionVol')
                 };
@@ -516,31 +460,37 @@
             }
 
             init() {
+                // Listeners
                 document.getElementById('calcBtn').addEventListener('click', () => {
                     this.triggerFlash();
                     this.calculate();
                 });
                 
+                // Toggle water input and injection visibility
                 this.inputs.curingMethod.forEach(radio => {
                     radio.addEventListener('change', (e) => {
                         this.handleMethodChange(e.target.value);
                     });
                 });
 
+                // Toggle Injection listener
                 this.inputs.useInjection.addEventListener('change', () => this.calculate());
 
+                // Ratio Slider Listener
                 this.inputs.mixRatio.addEventListener('input', (e) => {
                     const val = e.target.value;
                     this.outputs.ratioDisplay.innerText = `${val}% Peklo / ${100-val}% Sól`;
                     this.calculate();
                 });
 
+                // Auto-calc on input changes
                 const allInputs = document.querySelectorAll('input, select');
                 allInputs.forEach(input => {
                     input.addEventListener('input', () => this.calculate());
                     input.addEventListener('keyup', () => this.calculate());
                 });
 
+                // Initial run
                 this.handleMethodChange(document.querySelector('input[name="curingMethod"]:checked').value);
                 this.calculate();
             }
@@ -552,6 +502,8 @@
                 } else {
                     this.outputs.waterInputGroup.classList.add('hidden');
                     this.inputs.water.value = 0;
+                    
+                    // Reset Injection if switching to dry
                     this.inputs.injectionGroup.classList.add('hidden');
                     this.inputs.useInjection.checked = false;
                 }
@@ -561,7 +513,7 @@
             triggerFlash() {
                 const table = document.querySelector('table');
                 table.classList.remove('update-flash');
-                void table.offsetWidth; 
+                void table.offsetWidth; // trigger reflow
                 table.classList.add('update-flash');
             }
 
@@ -573,6 +525,7 @@
             }
 
             calculate() {
+                // 1. Get Values
                 const meatType = this.inputs.meatType.value;
                 const weightG = this.parseSafeFloat(this.inputs.weight.value, 0);
                 const waterG = this.parseSafeFloat(this.inputs.water.value, 0);
@@ -580,6 +533,7 @@
                 const fatContent = this.inputs.fatContent.value;
                 const method = document.querySelector('input[name="curingMethod"]:checked').value;
                 
+                // NEW: Check Injection Status
                 const isInjection = this.inputs.useInjection.checked && method === 'WET_EQ';
 
                 const targetSaltPct = this.parseSafeFloat(this.inputs.targetSalt.value, 2.0);
@@ -587,38 +541,57 @@
 
                 if (weightG <= 0) return;
 
+                // 2. Logic: Mass Basis
                 let totalMassG = weightG;
                 if (method === 'WET_EQ') {
                     totalMassG += waterG;
                 }
 
+                // 3. Logic: Hybrid Mix (Salt Driven)
+                // Total Salt Needed (grams)
                 const totalSaltNeededG = totalMassG * (targetSaltPct / 100);
+                
+                // Split based on Ratio
                 const cureSaltG = totalSaltNeededG * (ratioPeklo / 100);
                 const tableSaltG = totalSaltNeededG * ((100 - ratioPeklo) / 100);
 
+                // Calculate Resulting Nitrite PPM
+                // Cure Salt contains 0.6% Nitrite
                 const pureNitriteG = cureSaltG * this.CONSTANTS.POLISH_CURE_NITRITE;
                 const pureNitriteMg = pureNitriteG * 1000;
+                // PPM = mg / kg of Total Mass
                 const resultingPPM = pureNitriteMg / (totalMassG / 1000);
 
+                // Ascorbate
                 const ascorbateG = weightG * (this.CONSTANTS.ASCORBATE_PPM / 1000000);
                 const sugarG = weightG * 0.01;
 
+                // 4. Logic: Time (Diffusion vs Injection)
                 let timeDays = 0;
                 let injectionVolMl = 0;
 
                 if (isInjection) {
+                    // --- INJECTION ALGORITHM ---
+                    // Base diffusion time calculated normally, then reduced by distribution coefficient
                     const baseDiffusionTime = 0.5 * (thicknessCm * thicknessCm);
+                    // Coefficient 0.15 represents mechanical distribution efficiency vs pure diffusion
                     timeDays = (baseDiffusionTime * 0.15) + 2; 
+                    
+                    // Injection Volume (10% of meat weight standard)
                     injectionVolMl = weightG * 0.10;
                 } else {
+                    // --- STANDARD DIFFUSION ALGORITHM ---
                     timeDays = 0.5 * (thicknessCm * thicknessCm) + 2;
+                    // Fat barrier logic applies ONLY if NO injection
                     if (fatContent === 'MARBLED' || fatContent === 'FATTY') {
                         timeDays *= 1.2;
                     }
                 }
 
+                // 5. Logic: Velveting
                 const sodaG = weightG * this.CONSTANTS.VELVETING_RATIO;
 
+                // 6. Render
                 this.renderResults(
                     timeDays, 
                     totalMassG, 
@@ -628,29 +601,37 @@
             }
 
             renderResults(timeDays, totalMass, agents, context) {
-                const timeRounded = Math.ceil(timeDays);
-
-                this.outputs.time.innerText = `${timeRounded} dni`;
+                // Update Cards
+                this.outputs.time.innerText = `${timeDays.toFixed(1)} dni`;
                 this.outputs.totalWeight.innerText = `${totalMass.toFixed(0)} g`;
 
+                // Update Time Label & Detail based on Injection
                 if (context.isInjection) {
                     this.outputs.timeLabel.innerText = "Czas (Przyspieszony/Nastrzyk)";
                     this.outputs.timeLabel.classList.add('text-orange-400');
                     this.outputs.timeDetail.innerText = `Nastrzyk ${context.injectionVolMl.toFixed(0)}ml omija barierę dyfuzyjną`;
+                    
+                    // Show Injection Card
                     this.outputs.injectionResultCard.classList.remove('hidden');
                     this.outputs.resInjectionVol.innerText = `${context.injectionVolMl.toFixed(0)} ml`;
-                    this.inputs.fatContent.disabled = true;
+                    
+                    // Disable fat warning impact in text (visual only)
+                    this.inputs.fatContent.disabled = true; // Visual cue
                 } else {
                     this.outputs.timeLabel.innerText = "Czas Peklowania (Dyfuzja)";
                     this.outputs.timeLabel.classList.remove('text-orange-400');
                     this.outputs.timeDetail.innerText = `Dla ${context.thicknessCm}cm (${context.fatContent})`;
+                    
+                    // Hide Injection Card
                     this.outputs.injectionResultCard.classList.add('hidden');
                     this.inputs.fatContent.disabled = false;
                 }
 
+                // Update PPM Display
                 const ppmEl = this.outputs.ppmResult;
                 ppmEl.innerText = `${context.resultingPPM.toFixed(0)} ppm`;
                 
+                // PPM Color Logic
                 if (context.resultingPPM > 155) {
                     ppmEl.className = "font-mono font-bold text-red-500";
                 } else if (context.resultingPPM < 50) {
@@ -659,6 +640,7 @@
                     ppmEl.className = "font-mono font-bold text-emerald-400"; 
                 }
 
+                // Update Table
                 let html = `
                     <tr class="hover:bg-slate-800/50">
                         <td class="p-3 text-pink-400 font-bold">Polska Peklosól (0.6%)</td>
@@ -683,6 +665,7 @@
                 `;
                 this.outputs.table.innerHTML = html;
 
+                // Velveting Output
                 this.outputs.velveting.innerHTML = `
                     <div class="flex justify-between items-center">
                         <span>Soda Oczyszczona (NaHCO3):</span>
@@ -701,8 +684,7 @@
             generateReport(time, totalMass, agents, ctx) {
                 const today = new Date();
                 const finishDate = new Date();
-                const timeRounded = Math.ceil(time);
-                finishDate.setDate(today.getDate() + timeRounded);
+                finishDate.setDate(today.getDate() + Math.ceil(time));
 
                 let injectionNote = "";
                 if (ctx.isInjection) {
@@ -710,7 +692,7 @@
                 }
 
                 const report = `
-=== RAPORT DOMOWY (TOMASZ WAWRZAK v3.5) ===
+=== RAPORT DOMOWY (TOMASZ WAWRZAK v3.3) ===
 DATA: ${today.toLocaleDateString()}
 MIĘSO: ${ctx.meatType} | METODA: ${ctx.method} ${ctx.isInjection ? '(+NASTRZYK)' : ''}
 PARAMETRY: Sól ${ctx.targetSaltPct}% | Azotyny ${ctx.resultingPPM.toFixed(0)} ppm
@@ -718,7 +700,7 @@ PARAMETRY: Sól ${ctx.targetSaltPct}% | Azotyny ${ctx.resultingPPM.toFixed(0)} p
 1. CZAS PEKLOWANIA
    - Grubość: ${ctx.thicknessCm} cm
    - Tryb: ${ctx.isInjection ? 'PRZYSPIESZONY (Injection)' : 'DYFUZJA GRAWITACYJNA'}
-   - Czas: ${timeRounded} dni
+   - Czas: ${time.toFixed(1)} dni
    - Gotowe: ${finishDate.toLocaleDateString()}
 
 2. MIESZANKA SOLI (Razem: ${(agents.cureSaltG + agents.tableSaltG).toFixed(2)}g)
@@ -730,7 +712,7 @@ PARAMETRY: Sól ${ctx.targetSaltPct}% | Azotyny ${ctx.resultingPPM.toFixed(0)} p
    1. Rozpuść wszystkie sole w odmierzonej wodzie.${injectionNote}
    2. Zanurz mięso w pozostałej solance.
    3. Zamknij szczelnie (Vacuum/Worek).
-   4. Po ${timeRounded} dniach - opłucz, osusz i poddaj obróbce termicznej.
+   4. Po ${Math.ceil(time)} dniach - opłucz, osusz i poddaj obróbce termicznej.
 
 SMACZNEGO!
 ========================================
